@@ -42,11 +42,29 @@ def role_required(roles):
             
             #user = Usuario.query.get(session['user_id'])
             user = db.session.get(Usuario, session['user_id'])
+
+                        # 👇 AGREGAR ESTOS PRINTS PARA DEBUG
+            print(f"🔍 DEBUG ROLE_REQUIRED:")
+            print(f"   user_id en session: {session.get('user_id')}")
+            print(f"   usuario encontrado: {user}")
+            if user:
+                print(f"   rol del usuario: {user.rol}")
+                print(f"   roles permitidos: {roles}")
+                print(f"   ¿tiene acceso?: {user.rol in roles}")
+            
+            if not user or user.rol not in roles:
+                print(f"   ❌ ACCESO DENEGADO")
+                flash('No tienes permisos para acceder a esta sección', 'danger')
+                return redirect(url_for('index'))
+            
+            print(f"   ✅ ACCESO PERMITIDO")
+            
             #if user.rol not in roles:
             if not user or user.rol not in roles:
                 flash('No tienes permisos para acceder a esta función.', 'danger')
                 return redirect(url_for('index'))
             
+
             return f(*args, **kwargs)
         return decorated_function
     return decorator
