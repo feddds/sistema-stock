@@ -40,7 +40,8 @@ def role_required(roles):
                 flash('Por favor inicia sesión para acceder a esta página.', 'warning')
                 return redirect(url_for('login'))
             
-            user = Usuario.query.get(session['user_id'])
+            #user = Usuario.query.get(session['user_id'])
+            user = db.session.get(Usuario, session['user_id'])
             if user.rol not in roles:
                 flash('No tienes permisos para acceder a esta función.', 'danger')
                 return redirect(url_for('index'))
