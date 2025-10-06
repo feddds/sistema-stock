@@ -42,7 +42,8 @@ def role_required(roles):
             
             #user = Usuario.query.get(session['user_id'])
             user = db.session.get(Usuario, session['user_id'])
-            if user.rol not in roles:
+            #if user.rol not in roles:
+            if not user or user.rol not in roles:
                 flash('No tienes permisos para acceder a esta función.', 'danger')
                 return redirect(url_for('index'))
             
