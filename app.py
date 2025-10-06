@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from models import db, Insumo, Compra, Consumo, Usuario
 from datetime import datetime
 from functools import wraps
-from flask_migrate import Migrate
+#from flask_migrate import Migrate
 import os
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ app.config['SESSION_TYPE'] = 'filesystem'
 
 db.init_app(app)
 
-migrate = Migrate(app, db)
+# migrate = Migrate(app, db)
 
 # === DECORADORES DE SEGURIDAD ===
 def login_required(f):
