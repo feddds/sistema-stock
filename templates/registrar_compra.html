@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Registrar Compra</h2>
+
+<form method="POST">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="insumo_id" class="form-label">Insumo *</label>
+                <select class="form-control" id="insumo_id" name="insumo_id" required>
+                    <option value="">Seleccionar insumo...</option>
+                    {% for insumo in insumos %}
+                    <option value="{{ insumo.id }}" 
+                            data-cantidad-caja="{{ insumo.cantidad_por_caja }}"
+                            data-precio-caja="{{ insumo.precio_caja }}">
+                        {{ insumo.denominacion }} - {{ insumo.tipo }} ({{ insumo.modelo }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="cantidad_cajas" class="form-label">Cantidad de Cajas *</label>
+                <input type="number" step="0.01" class="form-control" id="cantidad_cajas" 
+                       name="cantidad_cajas" required>
+                <div class="form-text">
+                    <span id="info-unidades">Se cargarán 0 unidades al stock</span>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="precio_caja_compra" class="form-label">Precio por Caja ($) *</label>
+                <input type="number" step="0.01" class="form-control" id="precio_caja_compra" 
+                       name="precio_caja_compra" required>
+                <div class="form-text">
+                    <span id="info-costo-total">Costo total: $0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="proveedor" class="form-label">Proveedor</label>
+                <input type="text" class="form-control" id="proveedor" name="proveedor">
+            </div>
+            
+            <div class="mb-3">
+                <label for="lote" class="form-label">Número de Lote</label>
+                <input type="text" class="form-control" id="lote" name="lote">
+            </div>
+            
+            <div class="mb-3">
+                <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento</label>
+                <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento">
+            </div>
+        </div>
+    </div>
+    
+    <button type="submit" class="btn btn-success">Registrar Compra</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const insumoSelect = document.getElementById('insumo_id');
+    const cantidadCajas = document.getElementById('cantidad_cajas');
+    const precioCajaCompra = document.getElementById('precio_caja_compra');
+    const infoUnidades = document.getElementById('info-unidades');
+    const infoCostoTotal = document.getElementById('info-costo-total');
+    
+    function actualizarInfo() {
+        const selectedOption = insumoSelect.options[insumoSelect.selectedIndex];
+        const cantidadPorCaja = selectedOption.getAttribute('data-cantidad-caja');
+        const precioCajaSugerido = selectedOption.getAttribute('data-precio-caja');
+        const cajas = parseFloat(cantidadCajas.value) || 0;
+        const precio = parseFloat(precioCajaCompra.value) || 0;
+        
+        // Actualizar precio sugerido
+        if (precioCajaSugerido && !precioCajaCompra.value) {
+            precioCajaCompra.value = parseFloat(precioCajaSugerido).toFixed(2);
+        }
+        
+        // Actualizar info unidades
+        if (cantidadPorCaja && cajas > 0) {
+            const unidades = cajas * parseInt(cantidadPorCaja);
+            infoUnidades.textContent = `Se cargarán ${unidades} unidades al stock`;
+        } else {
+            infoUnidades.textContent = 'Se cargarán 0 unidades al stock';
+        }
+        
+        // Actualizar costo total
+        if (cajas > 0 && precio > 0) {
+            const costoTotal = cajas * precio;
+            infoCostoTotal.textContent = `Costo total: $${costoTotal.toFixed(2)}`;
+        } else {
+            infoCostoTotal.textContent = 'Costo total: $0';
+        }
+    }
+    
+    insumoSelect.addEventListener('change', actualizarInfo);
+    cantidadCajas.addEventListener('input', actualizarInfo);
+    precioCajaCompra.addEventListener('input', actualizarInfo);
+});
+</script>
+{% endblock %}

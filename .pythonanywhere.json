@@ -1,0 +1,6 @@
+{
+    "source_file": "wsgi.py",
+    "working_directory": "/home/tuusuario/stock_app",
+    "virtualenv_path": "/home/tuusuario/.virtualenvs/stock_app",
+    "command": "gunicorn --bind=unix:/tmp/tuusuario.pythonanywhere.com.socket wsgi:application"
+}

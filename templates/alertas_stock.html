@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>🚨 Alertas de Stock Bajo</h2>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">← Volver al Inicio</a>
+</div>
+
+<!-- Resumen de alertas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body text-center">
+                <h5 class="card-title">Stock Crítico</h5>
+                <h3 class="card-text">{{ alertas_criticas|length }}</h3>
+                <small>Necesitan reposición urgente</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body text-center">
+                <h5 class="card-title">Con Alertas Activas</h5>
+                <h3 class="card-text">{{ insumos_con_alerta|length }}</h3>
+                <small>Stock mínimo configurado</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body text-center">
+                <h5 class="card-title">Stock OK</h5>
+                <h3 class="card-text">{{ insumos_ok|length }}</h3>
+                <small>Por encima del mínimo</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h5 class="card-title">Sin Alertas</h5>
+                <h3 class="card-text">{{ insumos_sin_alerta|length }}</h3>
+                <small>Stock mínimo no configurado</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de alertas críticas -->
+{% if alertas_criticas %}
+<div class="card border-danger mb-4">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">⚠️ Stock Crítico - Reposición Urgente</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Insumo</th>
+                        <th>Stock Actual</th>
+                        <th>Stock Mínimo</th>
+                        <th>Déficit</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for insumo in alertas_criticas %}
+                    <tr class="table-danger">
+                        <td>
+                            <strong>{{ insumo.denominacion }}</strong><br>
+                            <small class="text-muted">{{ insumo.tipo }} - {{ insumo.modelo }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-danger">{{ "%.2f"|format(insumo.stock_actual) }} unid.</span>
+                        </td>
+                        <td>{{ "%.2f"|format(insumo.stock_minimo) }} unid.</td>
+                        <td>
+                            <strong>{{ "%.2f"|format(insumo.stock_minimo - insumo.stock_actual) }} unid.</strong>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('registrar_compra') }}?insumo_id={{ insumo.id }}" 
+                               class="btn btn-sm btn-success">
+                                🛒 Comprar
+                            </a>
+                            <a href="{{ url_for('gestion_insumos') }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                ✏️ Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Todos los insumos con alertas configuradas -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">📊 Estado de Stock con Alertas Configuradas</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Insumo</th>
+                        <th>Stock Actual</th>
+                        <th>Stock Mínimo</th>
+                        <th>Estado</th>
+                        <th>Porcentaje</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for insumo in insumos_con_alerta %}
+                    <tr class="{% if insumo.necesita_reposicion %}table-warning{% endif %}">
+                        <td>
+                            <strong>{{ insumo.denominacion }}</strong><br>
+                            <small class="text-muted">{{ insumo.tipo }} - {{ insumo.modelo }}</small>
+                        </td>
+                        <td>{{ "%.2f"|format(insumo.stock_actual) }} unid.</td>
+                        <td>{{ "%.2f"|format(insumo.stock_minimo) }} unid.</td>
+                        <td>
+                            {% if insumo.necesita_reposicion %}
+                            <span class="badge bg-danger">🔴 Stock Bajo</span>
+                            {% else %}
+                            <span class="badge bg-success">✅ Stock OK</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar 
+                                    {% if insumo.porcentaje_stock > 50 %}bg-success
+                                    {% elif insumo.porcentaje_stock > 25 %}bg-warning
+                                    {% else %}bg-danger{% endif %}" 
+                                    style="width: {{ insumo.porcentaje_stock }}%">
+                                    {{ "%.1f"|format(insumo.porcentaje_stock) }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('gestion_insumos') }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                ✏️ Configurar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Insumos sin alertas configuradas -->
+{% if insumos_sin_alerta %}
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">📝 Insumos Sin Alertas Configuradas</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            <small>Estos insumos no tienen stock mínimo configurado. Configúralos para recibir alertas.</small>
+        </p>
+        <div class="row">
+            {% for insumo in insumos_sin_alerta %}
+            <div class="col-md-3 mb-2">
+                <span class="badge bg-light text-dark">
+                    {{ insumo.denominacion }} - {{ insumo.tipo }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mt-3">
+            <a href="{{ url_for('gestion_insumos') }}" class="btn btn-outline-primary btn-sm">
+                ⚙️ Configurar Alertas
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Reporte de Stock</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Denominación</th>
+            <th>Tipo/Modelo</th>
+            <th>Unid. x Caja</th>
+            <th>Precio Caja</th>
+            <th>Compras (unid)</th>
+            <th>Consumos (unid)</th>
+            <th>Stock Actual</th>
+            <th>En Cajas/Unid</th>
+            <th>Valor Stock</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in reporte %}
+        <tr>
+            <td>{{ item.insumo.denominacion }}</td>
+            <td>{{ item.insumo.tipo }}<br><small>{{ item.insumo.modelo }}</small></td>
+            <td>{{ item.insumo.cantidad_por_caja }}</td>
+            <td>${{ "%.2f"|format(item.insumo.precio_caja) }}</td>
+            <td>{{ "%.2f"|format(item.total_unidades_compradas) }}</td>
+            <td>{{ "%.2f"|format(item.total_unidades_consumidas) }}</td>
+            <td><strong>{{ "%.2f"|format(item.stock_actual_unidades) }} unid.</strong></td>
+            <td>
+                {% if item.cajas_completas > 0 %}
+                    {{ item.cajas_completas }} caja(s)
+                {% endif %}
+                {% if item.unidades_sueltas > 0 %}
+                    {{ item.unidades_sueltas }} unid.
+                {% endif %}
+                {% if item.stock_actual_unidades == 0 %}
+                    0 unid.
+                {% endif %}
+            </td>
+            <td>${{ "%.2f"|format(item.valor_stock) }}</td>
+            <td>
+                {% if item.stock_actual_unidades > 0 %}
+                    <span class="badge bg-success">Disponible</span>
+                {% else %}
+                    <span class="badge bg-danger">Sin Stock</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

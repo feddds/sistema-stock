@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center">
+        <h1>Sistema de Stock de Insumos</h1>
+        <p class="lead">Gestiona tus compras y consumos de manera eficiente</p>
+    </div>
+</div>
+
+<!-- PRIMERA FILA - OPERACIONES PRINCIPALES -->
+<div class="row mt-5">
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">📦 Crear Insumo</h5>
+                <p class="card-text">Agrega nuevos insumos al sistema</p>
+                <a href="{{ url_for('crear_insumo') }}" class="btn btn-primary">Ir</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">🛒 Registrar Compra</h5>
+                <p class="card-text">Carga nuevas compras de insumos</p>
+                <a href="{{ url_for('registrar_compra') }}" class="btn btn-success">Ir</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">📤 Registrar Consumo</h5>
+                <p class="card-text">Registra consumo de insumos</p>
+                <a href="{{ url_for('registrar_consumo') }}" class="btn btn-warning">Ir</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">📊 Reporte Stock</h5>
+                <p class="card-text">Consulta stock actual</p>
+                <a href="{{ url_for('reporte_stock') }}" class="btn btn-info">Ir</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SEGUNDA FILA - LISTADOS E HISTORIAL -->
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">📋 Listado Compras</h5>
+                <p class="card-text">Ver historial completo de compras</p>
+                <a href="{{ url_for('listado_compras') }}" class="btn btn-outline-success">Ir</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">📋 Listado Consumos</h5>
+                <p class="card-text">Ver historial completo de consumos</p>
+                <a href="{{ url_for('listado_consumos') }}" class="btn btn-outline-danger">Ir</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ESPACIOS PARA FUTURAS FUNCIONALIDADES -->
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100 border-secondary">
+            <div class="card-body">
+                <h5 class="card-title text-muted">📈 Gráficos</h5>
+                <p class="card-text text-muted">Próximamente</p>
+                <button class="btn btn-outline-secondary" disabled>Próximamente</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100 border-secondary">
+            <div class="card-body">
+                <h5 class="card-title text-muted">📤 Exportar</h5>
+                <p class="card-text text-muted">Próximamente</p>
+                <button class="btn btn-outline-secondary" disabled>Próximamente</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RESUMEN RÁPIDO -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h5 class="card-title">🚀 Sistema de Stock Completamente Funcional</h5>
+                <p class="card-text mb-1">
+                    <strong>Gestión completa:</strong> Insumos → Compras → Consumos → Reportes
+                </p>
+                <small class="text-muted">
+                    Base de datos SQLite • Interface Bootstrap • Cálculos automáticos
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

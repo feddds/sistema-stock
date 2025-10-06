@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Registrar Consumo</h2>
+
+<form method="POST">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="insumo_id" class="form-label">Insumo *</label>
+                <select class="form-control" id="insumo_id" name="insumo_id" required>
+                    <option value="">Seleccionar insumo...</option>
+                    {% for insumo in insumos %}
+                    <option value="{{ insumo.id }}" data-stock="{{ insumo.stock_actual }}">
+                        {{ insumo.denominacion }} - {{ insumo.tipo }} ({{ insumo.modelo }})
+                    </option>
+                    {% endfor %}
+                </select>
+                <div class="form-text">
+                    <span id="info-stock">Stock disponible: 0 unidades</span>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="cantidad_unidades" class="form-label">Cantidad de Unidades *</label>
+                <input type="number" step="0.01" class="form-control" id="cantidad_unidades" 
+                       name="cantidad_unidades" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="proyecto" class="form-label">Proyecto/Obra</label>
+                <input type="text" class="form-control" id="proyecto" name="proyecto">
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="responsable" class="form-label">Responsable *</label>
+                <input type="text" class="form-control" id="responsable" name="responsable" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="observaciones" class="form-label">Observaciones</label>
+                <textarea class="form-control" id="observaciones" name="observaciones" rows="4"></textarea>
+            </div>
+        </div>
+    </div>
+    
+    <button type="submit" class="btn btn-warning">Registrar Consumo</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const insumoSelect = document.getElementById('insumo_id');
+    const infoStock = document.getElementById('info-stock');
+    
+    function actualizarInfoStock() {
+        const selectedOption = insumoSelect.options[insumoSelect.selectedIndex];
+        const stock = selectedOption.getAttribute('data-stock');
+        
+        if (stock) {
+            infoStock.textContent = `Stock disponible: ${stock} unidades`;
+        } else {
+            infoStock.textContent = 'Stock disponible: 0 unidades';
+        }
+    }
+    
+    insumoSelect.addEventListener('change', actualizarInfoStock);
+});
+</script>
+{% endblock %}

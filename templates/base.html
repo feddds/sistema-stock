@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock de Insumos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .user-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 5px 15px;
+            margin-right: 10px;
+        }
+        .role-badge {
+            font-size: 0.7em;
+            margin-left: 5px;
+        }
+        .logo-img {
+            height: 32px;
+        }
+        @media (max-width: 768px) {
+            .logo-img {
+                height: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Justo después del navbar, antes del container -->
+<div class="container mt-2">
+    <div class="alert alert-warning alert-dismissible fade show">
+        <strong>DEBUG:</strong> 
+        User ID: {{ session.user_id }}, 
+        Rol: {{ session.user_rol }}, 
+        Nombre: {{ session.user_nombre }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
+    <!-- Navbar mejorada con Logo -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <!-- Logo con estilo más moderno -->
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                     alt="Logo Empresa" 
+                     height="42" 
+                     class="d-inline-block align-text-top me-2 rounded"
+                     style="object-fit: contain;"
+                     onerror="this.style.display='none'">
+                <span class="fw-bold">Stock App</span>
+            </a>
+            
+            <!-- Botón para móviles -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Menú colapsable -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if session.user_id %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">Inicio</a>
+                    </li>
+                    
+                       <!-- 🚨 AGREGA ESTA LÍNEA JUSTO AQUÍ -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('alertas_stock') }}">
+                            🚨 Alertas Stock
+                        </a>
+                    </li>
+
+                    <!-- Menú Reportes - Visible para todos los roles -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('reporte_stock') }}">Reporte Stock</a>
+                    </li>
+                    
+                    <!-- Menú Compras - Solo compras y admin -->
+                    {% if session.user_rol in ['compras', 'admin'] %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Compras
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('registrar_compra') }}">Registrar Compra</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('listado_compras') }}">Listado Compras</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Menú Stock - Solo stock y admin -->
+                    {% if session.user_rol in ['stock', 'admin'] %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Stock
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('registrar_consumo') }}">Registrar Consumo</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('listado_consumos') }}">Listado Consumos</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Menú Admin - Solo admin -->
+                    {% if session.user_rol == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('crear_insumo') }}">Crear Insumo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('gestion_insumos') }}">Gestionar Insumos</a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+                
+                <!-- Información del usuario -->
+                {% if session.user_id %}
+                <div class="navbar-nav">
+                    <div class="user-info">
+                        <span class="navbar-text">
+                            👋 <strong>{{ session.user_nombre }}</strong>
+                            <span class="role-badge badge 
+                                {% if session.user_rol == 'admin' %}bg-danger
+                                {% elif session.user_rol == 'compras' %}bg-success
+                                {% elif session.user_rol == 'stock' %}bg-warning
+                                {% else %}bg-secondary{% endif %}">
+                                {{ session.user_rol | upper }}
+                            </span>
+                        </span>
+                    </div>
+                    <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">
+                        Cerrar Sesión
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

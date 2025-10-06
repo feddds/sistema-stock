@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Listado de Compras</h2>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Volver al Inicio</a>
+</div>
+
+{% if compras %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Fecha</th>
+                <th>Insumo</th>
+                <th>Tipo/Modelo</th>
+                <th>Cantidad</th>
+                <th>Precio Caja</th>
+                <th>Proveedor</th>
+                <th>Lote</th>
+                <th>Vencimiento</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for compra in compras %}
+            <tr>
+                <td>{{ compra.fecha_compra.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td><strong>{{ compra.insumo.denominacion }}</strong></td>
+                <td>{{ compra.insumo.tipo }}<br><small class="text-muted">{{ compra.insumo.modelo }}</small></td>
+                <td>
+                    <span class="badge bg-success">{{ compra.cantidad_cajas }} cajas</span>
+                    <br>
+                    <small class="text-muted">{{ compra.cantidad_unidades|round(2) }} unid.</small>
+                </td>
+                <td>${{ "%.2f"|format(compra.precio_caja_compra) }}</td>
+                <td>{{ compra.proveedor or '-' }}</td>
+                <td>{{ compra.lote or '-' }}</td>
+                <td>
+                    {% if compra.fecha_vencimiento %}
+                        {{ compra.fecha_vencimiento.strftime('%d/%m/%Y') }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    <strong>${{ "%.2f"|format(compra.costo_total) }}</strong>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Resumen estadístico -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Total Compras</h5>
+                <h3 class="card-text">{{ compras|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Cajas</h5>
+                <h3 class="card-text">{{ "%.2f"|format(compras|sum(attribute='cantidad_cajas')) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Total Unidades</h5>
+                <h3 class="card-text">{{ "%.2f"|format(compras|sum(attribute='cantidad_unidades')) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Inversión Total</h5>
+                <h3 class="card-text">${{ "%.2f"|format(compras|sum(attribute='costo_total')) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="alert alert-info text-center">
+    <h4>No hay compras registradas</h4>
+    <p>Registra tu primera compra desde el menú principal.</p>
+    <a href="{{ url_for('registrar_compra') }}" class="btn btn-primary">Registrar Primera Compra</a>
+</div>
+{% endif %}
+
+{% endblock %}
