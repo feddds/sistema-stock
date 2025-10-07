@@ -1,0 +1,285 @@
+<!-- templates/ayuda.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">📚 Centro de Ayuda</h1>
+            <p class="lead">Guía completa para usar el Sistema de Gestión de Stock</p>
+        </div>
+    </div>
+
+    <!-- Navegación Rápida -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5>🚀 Navegación Rápida</h5>
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="#login" class="btn btn-outline-primary btn-sm w-100">🔐 Login</a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="#insumos" class="btn btn-outline-primary btn-sm w-100">📦 Insumos</a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="#compras" class="btn btn-outline-primary btn-sm w-100">🛒 Compras</a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="#alertas" class="btn btn-outline-primary btn-sm w-100">🚨 Alertas</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Login -->
+    <div id="login" class="row mb-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>🔐 Acceso al Sistema</h4>
+                </div>
+                <div class="card-body">
+                    <h5>Usuarios de Prueba Disponibles:</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Contraseña</th>
+                                    <th>Rol</th>
+                                    <th>Permisos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>admin</code></td>
+                                    <td><code>admin123</code></td>
+                                    <td><span class="badge bg-danger">Administrador</span></td>
+                                    <td>Acceso total al sistema</td>
+                                </tr>
+                                <tr>
+                                    <td><code>compras</code></td>
+                                    <td><code>compras123</code></td>
+                                    <td><span class="badge bg-success">Compras</span></td>
+                                    <td>Gestionar compras y reportes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>stock</code></td>
+                                    <td><code>stock123</code></td>
+                                    <td><span class="badge bg-warning">Stock</span></td>
+                                    <td>Gestionar consumos y stock</td>
+                                </tr>
+                                <tr>
+                                    <td><code>basico</code></td>
+                                    <td><code>basico123</code></td>
+                                    <td><span class="badge bg-secondary">Básico</span></td>
+                                    <td>Solo ver reportes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Gestión de Insumos -->
+    <div id="insumos" class="row mb-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4>📦 Gestión de Insumos</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Crear Nuevo Insumo</h5>
+                            <p><strong>Permiso requerido:</strong> <span class="badge bg-danger">Administrador</span></p>
+                            <ol>
+                                <li>Ir a <strong>"Crear Insumo"</strong> en el menú Admin</li>
+                                <li>Completar todos los campos obligatorios (*)</li>
+                                <li>Configurar <strong>Stock Mínimo</strong> para alertas</li>
+                                <li>Hacer click en <button class="btn btn-primary btn-sm">Crear Insumo</button></li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Gestionar Insumos Existentes</h5>
+                            <p><strong>Permiso requerido:</strong> <span class="badge bg-danger">Administrador</span></p>
+                            <ol>
+                                <li>Ir a <strong>"Gestionar Insumos"</strong></li>
+                                <li>Usar la barra de búsqueda para filtrar</li>
+                                <li>Click en <button class="btn btn-outline-primary btn-sm">✏️</button> para editar</li>
+                                <li>Click en <button class="btn btn-outline-danger btn-sm">🗑️</button> para eliminar</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <strong>💡 Tip:</strong> El <strong>Stock Mínimo</strong> activa alertas automáticas cuando el stock baja del nivel configurado.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Compras -->
+    <div id="compras" class="row mb-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4>🛒 Gestión de Compras</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Registrar Nueva Compra</h5>
+                            <p><strong>Permiso requerido:</strong> <span class="badge bg-success">Compras</span> o <span class="badge bg-danger">Admin</span></p>
+                            <ol>
+                                <li>Ir a <strong>"Compras → Registrar Compra"</strong></li>
+                                <li>Seleccionar el insumo de la lista</li>
+                                <li>Ingresar cantidad de cajas y precio</li>
+                                <li>Completar datos del proveedor (opcional)</li>
+                                <li>Hacer click en <button class="btn btn-success btn-sm">Registrar Compra</button></li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Ver Historial de Compras</h5>
+                            <p><strong>Permiso requerido:</strong> <span class="badge bg-success">Compras</span> o <span class="badge bg-danger">Admin</span></p>
+                            <ol>
+                                <li>Ir a <strong>"Compras → Listado Compras"</strong></li>
+                                <li>Ver todas las compras registradas</li>
+                                <li>Revisar estadísticas de gastos</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <strong>💡 Tip:</strong> El sistema calcula automáticamente el precio unitario y actualiza el stock al registrar una compra.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Alertas de Stock -->
+    <div id="alertas" class="row mb-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4>🚨 Sistema de Alertas de Stock</h4>
+                </div>
+                <div class="card-body">
+                    <h5>¿Cómo funcionan las alertas?</h5>
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="alert alert-success">
+                                <h6>✅ Stock OK</h6>
+                                <p>Cuando el stock está por encima del mínimo configurado</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="alert alert-warning">
+                                <h6>⚠️ Alerta Activa</h6>
+                                <p>Cuando el stock está cerca del mínimo</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="alert alert-danger">
+                                <h6>🔴 Stock Crítico</h6>
+                                <p>Cuando el stock está por debajo del mínimo</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5>Gestión de Alertas</h5>
+                    <ol>
+                        <li>Ir a <strong>"🚨 Alertas Stock"</strong> en el menú principal</li>
+                        <li>Ver resumen de stock crítico y en advertencia</li>
+                        <li>Click en <button class="btn btn-success btn-sm">🛒 Comprar</button> para reposición rápida</li>
+                        <li>Click en <button class="btn btn-outline-primary btn-sm">✏️ Configurar</button> para ajustar niveles de alerta</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preguntas Frecuentes -->
+    <div id="faq" class="row mb-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4>❓ Preguntas Frecuentes</h4>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    ¿Cómo configuro las alertas de stock?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Ve a <strong>Gestionar Insumos</strong>, edita el insumo y configura el campo <strong>"Stock Mínimo"</strong>. El sistema alertará automáticamente cuando el stock baje de ese nivel.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    ¿Puedo tener múltiples usuarios?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Sí, el sistema soporta múltiples usuarios con diferentes roles: <strong>Administrador, Compras, Stock y Básico</strong>. Cada rol tiene permisos específicos.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    ¿Los datos se respaldan automáticamente?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Sí, PythonAnywhere realiza respaldos automáticos. Además, todo el código está versionado en GitHub para mayor seguridad.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contacto/Soporte -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-secondary">
+                <div class="card-body text-center">
+                    <h5>¿Necesitas ayuda adicional?</h5>
+                    <p>Contacta al administrador del sistema para soporte técnico o nuevas funcionalidades.</p>
+                    <button class="btn btn-outline-primary" onclick="location.reload()">🔄 Actualizar Página</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+    .card {
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
