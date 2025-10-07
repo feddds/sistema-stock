@@ -353,6 +353,11 @@ def listado_compras():
     compras = Compra.query.order_by(Compra.fecha_compra.desc()).all()
     return render_template('listado_compras.html', compras=compras)
 
+# Agregar esta ruta en app.py
+@app.route('/ayuda')
+def ayuda():
+    return render_template('ayuda.html')
+
 def crear_usuarios_prueba():
     """Crear usuarios de prueba si no existen"""
     with app.app_context():
