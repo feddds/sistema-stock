@@ -18,28 +18,30 @@
             margin-left: 5px;
         }
         .logo-img {
-            height: 32px;
+            height: 42px;
+            border-radius: 4px;
+            object-fit: contain;
         }
         @media (max-width: 768px) {
             .logo-img {
-                height: 28px;
+                height: 36px;
             }
+        }
+        .navbar-nav .nav-link {
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
-    <!-- Navbar mejorada con Logo -->
+    <!-- Navbar con container-fluid -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <!-- Logo con estilo más moderno -->
+        <div class="container-fluid">  <!-- ← CAMBIADO A container-fluid -->
+            <!-- Logo SOLO -->
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" 
                      alt="Logo Empresa" 
-                     height="42" 
-                     class="d-inline-block align-text-top me-2 rounded"
-                     style="object-fit: contain;"
+                     class="logo-img d-inline-block align-text-top"
                      onerror="this.style.display='none'">
-                <span class="fw-bold">Stock App</span>
             </a>
             
             <!-- Botón para móviles -->
@@ -52,30 +54,50 @@
                 <ul class="navbar-nav me-auto">
                     {% if session.user_id %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">Inicio</a>
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            🏠 Inicio
+                        </a>
                     </li>
                     
-                       <!-- 🚨 AGREGA ESTA LÍNEA JUSTO AQUÍ -->
+                    <!-- Alertas de Stock - Siempre visible -->
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('alertas_stock') }}">
-                            🚨 Alertas Stock
+                            🚨 
+                            <span class="d-none d-md-inline">Alertas</span>
                         </a>
                     </li>
 
-                    <!-- Menú Reportes - Visible para todos los roles -->
+                    <!-- Ayuda - Siempre visible -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('reporte_stock') }}">Reporte Stock</a>
+                        <a class="nav-link" href="{{ url_for('ayuda') }}">
+                            📚 
+                            <span class="d-none d-md-inline">Ayuda</span>
+                        </a>
+                    </li>
+
+                    <!-- Menú Más (Reportes) Compacto -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            📊 
+                            <span class="d-none d-md-inline">Más</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('reporte_stock') }}">📈 Stock Actual</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('listado_compras') }}">🛒 Historial Compras</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('listado_consumos') }}">📤 Historial Consumos</a></li>
+                        </ul>
                     </li>
                     
                     <!-- Menú Compras - Solo compras y admin -->
                     {% if session.user_rol in ['compras', 'admin'] %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Compras
+                            🛒 
+                            <span class="d-none d-md-inline">Compras</span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('registrar_compra') }}">Registrar Compra</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('listado_compras') }}">Listado Compras</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('registrar_compra') }}">➕ Registrar Compra</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('listado_compras') }}">📋 Listado Compras</a></li>
                         </ul>
                     </li>
                     {% endif %}
@@ -84,22 +106,27 @@
                     {% if session.user_rol in ['stock', 'admin'] %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Stock
+                            📦 
+                            <span class="d-none d-md-inline">Stock</span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('registrar_consumo') }}">Registrar Consumo</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('listado_consumos') }}">Listado Consumos</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('registrar_consumo') }}">📤 Registrar Consumo</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('listado_consumos') }}">📋 Listado Consumos</a></li>
                         </ul>
                     </li>
                     {% endif %}
                     
                     <!-- Menú Admin - Solo admin -->
                     {% if session.user_rol == 'admin' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('crear_insumo') }}">Crear Insumo</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('gestion_insumos') }}">Gestionar Insumos</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            ⚙️ 
+                            <span class="d-none d-md-inline">Admin</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('crear_insumo') }}">➕ Crear Insumo</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('gestion_insumos') }}">📦 Gestionar Insumos</a></li>
+                        </ul>
                     </li>
                     {% endif %}
                     {% endif %}
@@ -129,7 +156,7 @@
         </div>
     </nav>
 
-    <!-- Contenido principal -->
+    <!-- Contenido principal SÍ mantiene container normal -->
     <div class="container mt-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
