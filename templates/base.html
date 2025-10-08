@@ -117,19 +117,22 @@
                     {% endif %}
                     
                     <!-- Menú Admin - Solo admin -->
-                    {% if session.user_rol == 'admin' %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            ⚙️ 
-                            <span class="d-none d-md-inline">Admin</span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('crear_insumo') }}">➕ Crear Insumo</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('gestion_insumos') }}">📦 Gestionar Insumos</a></li>
-                        </ul>
-                    </li>
-                    {% endif %}
-                    {% endif %}
+                {% if session.user_rol == 'admin' %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        ⚙️ 
+                        <span class="d-none d-md-inline">Admin</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('crear_insumo') }}">➕ Crear Insumo</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('gestion_insumos') }}">📦 Gestionar Insumos</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('gestion_centros') }}">🏭 Gestionar Centros</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('gestion_trabajadores') }}">👷 Gestionar Trabajadores</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+                {% endif %}
                 </ul>
                 
                 <!-- Información del usuario -->

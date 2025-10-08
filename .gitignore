@@ -13,3 +13,5 @@ instance/
 .pytest_cache/
 .coverage
 htmlcov/
+database.db
+migrations/

@@ -1,9 +1,44 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Listado de Consumos</h2>
-    <a href="{{ url_for('index') }}" class="btn btn-secondary">Volver al Inicio</a>
+    <h2>📤 Listado de Consumos</h2>
+    <div>
+        <a href="{{ url_for('exportar_consumos_excel') }}" class="btn btn-success me-2" title="Exportar a Excel">
+            📊 Exportar Excel
+        </a>
+        <a href="{{ url_for('registrar_consumo') }}" class="btn btn-primary me-2">➕ Nuevo Consumo</a>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">← Volver al Inicio</a>
+    </div>
+</div>
+
+
+<!-- Filtros Rápidos -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" id="buscarConsumos" class="form-control" placeholder="🔍 Buscar en consumos...">
+            </div>
+            <div class="col-md-4">
+                <select id="filtroCentro" class="form-select">
+                    <option value="">Todos los centros</option>
+                    {% for centro in centros_unicos %}
+                    <option value="{{ centro }}">{{ centro }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select id="filtroTrabajador" class="form-select">
+                    <option value="">Todos los trabajadores</option>
+                    {% for trabajador in trabajadores_unicos %}
+                    <option value="{{ trabajador }}">{{ trabajador }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% if consumos %}
@@ -11,33 +46,70 @@
     <table class="table table-striped table-hover">
         <thead class="table-dark">
             <tr>
-                <th>Fecha</th>
-                <th>Insumo</th>
-                <th>Tipo/Modelo</th>
-                <th>Cantidad</th>
-                <th>Proyecto</th>
-                <th>Responsable</th>
-                <th>Observaciones</th>
-                <th>Costo</th>
+                <th>📅 Fecha</th>
+                <th>📦 Insumo</th>
+                <th>🔧 Tipo/Modelo</th>
+                <th>📊 Cantidad</th>
+                <th>🏭 Centro</th>
+                <th>👷 Trabajador</th>
+                <th>🏗️ Proyecto</th>
+                <th>📝 Observaciones</th>
+                <th>💰 Costo</th>
+                {% if session.user_rol == 'admin' %}
+                <th width="100">⚙️ Acciones</th>
+                {% endif %}
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tablaConsumosBody">
             {% for consumo in consumos %}
-            <tr>
-                <td>{{ consumo.fecha_consumo.strftime('%d/%m/%Y %H:%M') }}</td>
-                <td><strong>{{ consumo.insumo.denominacion }}</strong></td>
-                <td>{{ consumo.insumo.tipo }}<br><small class="text-muted">{{ consumo.insumo.modelo }}</small></td>
+            <tr data-consumo-id="{{ consumo.id }}" 
+                data-centro="{{ consumo.centro_consumo.nombre }}" 
+                data-trabajador="{{ consumo.trabajador.nombre }}">
                 <td>
-                    <span class="badge bg-warning text-dark">{{ consumo.cantidad_unidades }} unid.</span>
+                    <small>{{ consumo.fecha_consumo.strftime('%d/%m/%Y') }}</small>
+                    <br><small class="text-muted">{{ consumo.fecha_consumo.strftime('%H:%M') }}</small>
+                </td>
+                <td><strong>{{ consumo.insumo.denominacion }}</strong></td>
+                <td>
+                    {{ consumo.insumo.tipo }}
+                    <br><small class="text-muted">{{ consumo.insumo.modelo }}</small>
+                </td>
+                <td>
+                    <span class="badge bg-warning text-dark">{{ "%.2f"|format(consumo.cantidad_unidades) }} unid.</span>
                     <br>
                     <small class="text-muted">{{ "%.2f"|format(consumo.cantidad_cajas_equivalentes) }} cajas</small>
                 </td>
+                <td>
+                    <span class="badge bg-info">{{ consumo.centro_consumo.nombre }}</span>
+                </td>
+                <td>
+                    <strong>{{ consumo.trabajador.nombre }}</strong>
+                    <br><small class="text-muted">{{ consumo.trabajador.codigo }}</small>
+                </td>
                 <td>{{ consumo.proyecto or '-' }}</td>
-                <td>{{ consumo.responsable }}</td>
-                <td>{{ consumo.observaciones or '-' }}</td>
+                <td>
+                    {% if consumo.observaciones %}
+                    <span title="{{ consumo.observaciones }}">
+                        {{ consumo.observaciones[:30] }}{% if consumo.observaciones|length > 30 %}...{% endif %}
+                    </span>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
                 <td>
                     <strong>${{ "%.2f"|format(consumo.costo_consumo) }}</strong>
                 </td>
+                {% if session.user_rol == 'admin' %}
+                <td>
+                    <button class="btn btn-outline-primary btn-sm" 
+                            onclick="editarConsumo({{ consumo.id }})"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#modalEditarConsumo"
+                            title="Editar consumo">
+                        ✏️
+                    </button>
+                </td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>
@@ -46,27 +118,35 @@
 
 <!-- Resumen estadístico -->
 <div class="row mt-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-white bg-info">
-            <div class="card-body">
-                <h5 class="card-title">Total Consumos</h5>
+            <div class="card-body text-center">
+                <h5 class="card-title">📊 Total Consumos</h5>
                 <h3 class="card-text">{{ consumos|length }}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-white bg-warning">
-            <div class="card-body">
-                <h5 class="card-title">Total Unidades</h5>
+            <div class="card-body text-center">
+                <h5 class="card-title">📦 Total Unidades</h5>
                 <h3 class="card-text">{{ "%.2f"|format(consumos|sum(attribute='cantidad_unidades')) }}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-white bg-danger">
-            <div class="card-body">
-                <h5 class="card-title">Costo Total</h5>
+            <div class="card-body text-center">
+                <h5 class="card-title">💰 Costo Total</h5>
                 <h3 class="card-text">${{ "%.2f"|format(consumos|sum(attribute='costo_consumo')) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body text-center">
+                <h5 class="card-title">🏭 Centros</h5>
+                <h3 class="card-text">{{ centros_unicos|length }}</h3>
             </div>
         </div>
     </div>
@@ -74,10 +154,206 @@
 
 {% else %}
 <div class="alert alert-info text-center">
-    <h4>No hay consumos registrados</h4>
+    <h4>📭 No hay consumos registrados</h4>
     <p>Registra tu primer consumo desde el menú principal.</p>
-    <a href="{{ url_for('registrar_consumo') }}" class="btn btn-primary">Registrar Primer Consumo</a>
+    <a href="{{ url_for('registrar_consumo') }}" class="btn btn-primary">➕ Registrar Primer Consumo</a>
 </div>
 {% endif %}
 
+<!-- Modal para Editar Consumo (Solo Admin) -->
+{% if session.user_rol == 'admin' %}
+<div class="modal fade" id="modalEditarConsumo" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">✏️ Editar Consumo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarConsumo" method="POST" action="{{ url_for('editar_consumo') }}">
+                    <input type="hidden" id="editConsumoId" name="id">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">📦 Insumo *</label>
+                                <select class="form-control" id="editInsumoId" name="insumo_id" required>
+                                    <option value="">Seleccionar insumo...</option>
+                                    {% for insumo in insumos %}
+                                    <option value="{{ insumo.id }}">{{ insumo.denominacion }} - {{ insumo.tipo }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">🔢 Cantidad de Unidades *</label>
+                                <input type="number" step="0.01" class="form-control" id="editCantidadUnidades" 
+                                       name="cantidad_unidades" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">🏗️ Proyecto/Obra</label>
+                                <input type="text" class="form-control" id="editProyecto" name="proyecto">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">🏭 Centro de Consumo *</label>
+                                <select class="form-control" id="editCentroConsumoId" name="centro_consumo_id" required>
+                                    <option value="">Seleccionar centro...</option>
+                                    {% for centro in centros %}
+                                    <option value="{{ centro.id }}">{{ centro.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">👷 Trabajador *</label>
+                                <select class="form-control" id="editTrabajadorId" name="trabajador_id" required>
+                                    <option value="">Seleccionar trabajador...</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">📝 Observaciones</label>
+                                <textarea class="form-control" id="editObservaciones" name="observaciones" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del consumo -->
+                    <div class="alert alert-info">
+                        <h6>📊 Información del Consumo</h6>
+                        <div id="infoConsumoActual" class="mt-2">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarCambiosConsumo()">
+                    💾 Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+// Datos para filtros y actualización de trabajadores
+const trabajadoresPorCentro = {
+    {% for centro in centros %}
+    {{ centro.id }}: [
+        {% for trabajador in centro.trabajadores %}
+        {% if trabajador.activo %}
+        { id: {{ trabajador.id }}, nombre: "{{ trabajador.nombre }}", codigo: "{{ trabajador.codigo }}" },
+        {% endif %}
+        {% endfor %}
+    ],
+    {% endfor %}
+};
+
+// Actualizar lista de trabajadores según centro seleccionado
+function actualizarTrabajadoresEdicion() {
+    const centroId = document.getElementById('editCentroConsumoId').value;
+    const trabajadorSelect = document.getElementById('editTrabajadorId');
+    
+    // Limpiar select de trabajadores
+    trabajadorSelect.innerHTML = '<option value="">Seleccionar trabajador...</option>';
+    
+    if (centroId && trabajadoresPorCentro[centroId]) {
+        // Agregar trabajadores del centro seleccionado
+        trabajadoresPorCentro[centroId].forEach(trabajador => {
+            const option = document.createElement('option');
+            option.value = trabajador.id;
+            option.textContent = `${trabajador.codigo} - ${trabajador.nombre}`;
+            trabajadorSelect.appendChild(option);
+        });
+    }
+}
+
+// Editar consumo - llenar formulario
+function editarConsumo(consumoId) {
+    fetch(`/get_consumo/${consumoId}`)
+        .then(response => response.json())
+        .then(consumo => {
+            document.getElementById('editConsumoId').value = consumo.id;
+            document.getElementById('editInsumoId').value = consumo.insumo_id;
+            document.getElementById('editCantidadUnidades').value = consumo.cantidad_unidades;
+            document.getElementById('editProyecto').value = consumo.proyecto || '';
+            document.getElementById('editCentroConsumoId').value = consumo.centro_consumo_id;
+            document.getElementById('editObservaciones').value = consumo.observaciones || '';
+            
+            // Actualizar trabajadores según el centro y seleccionar el actual
+            actualizarTrabajadoresEdicion();
+            setTimeout(() => {
+                document.getElementById('editTrabajadorId').value = consumo.trabajador_id;
+            }, 100);
+            
+            // Mostrar información del consumo
+            const infoConsumo = document.getElementById('infoConsumoActual');
+            infoConsumo.innerHTML = `
+                <div class="row">
+                    <div class="col-6">
+                        <strong>Fecha registro:</strong><br>
+                        ${new Date(consumo.fecha_consumo).toLocaleDateString('es-ES')}
+                    </div>
+                    <div class="col-6">
+                        <strong>Costo actual:</strong><br>
+                        $${consumo.costo_consumo.toFixed(2)}
+                    </div>
+                </div>
+            `;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al cargar los datos del consumo');
+        });
+}
+
+// Guardar cambios del consumo
+function guardarCambiosConsumo() {
+    document.getElementById('formEditarConsumo').submit();
+}
+
+// Event listener para actualizar trabajadores al cambiar centro
+document.getElementById('editCentroConsumoId').addEventListener('change', actualizarTrabajadoresEdicion);
+
+// Filtrado en tiempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const buscarInput = document.getElementById('buscarConsumos');
+    const filtroCentro = document.getElementById('filtroCentro');
+    const filtroTrabajador = document.getElementById('filtroTrabajador');
+    
+    function filtrarConsumos() {
+        const busqueda = buscarInput.value.toLowerCase();
+        const centroFiltro = filtroCentro.value;
+        const trabajadorFiltro = filtroTrabajador.value;
+        const filas = document.querySelectorAll('#tablaConsumosBody tr');
+        
+        filas.forEach(fila => {
+            const textoFila = fila.textContent.toLowerCase();
+            const centro = fila.getAttribute('data-centro');
+            const trabajador = fila.getAttribute('data-trabajador');
+            
+            const coincideBusqueda = textoFila.includes(busqueda);
+            const coincideCentro = !centroFiltro || centro === centroFiltro;
+            const coincideTrabajador = !trabajadorFiltro || trabajador === trabajadorFiltro;
+            
+            if (coincideBusqueda && coincideCentro && coincideTrabajador) {
+                fila.style.display = '';
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+    }
+    
+    buscarInput.addEventListener('input', filtrarConsumos);
+    filtroCentro.addEventListener('change', filtrarConsumos);
+    filtroTrabajador.addEventListener('change', filtrarConsumos);
+});
+</script>
 {% endblock %}

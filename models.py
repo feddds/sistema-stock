@@ -23,6 +23,36 @@ class Usuario(db.Model):
     def __repr__(self):
         return f'<Usuario {self.username} - {self.rol}>'
 
+class CentroConsumo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(50), nullable=False, unique=True)
+    descripcion = db.Column(db.String(200))
+    activo = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relaciones
+    trabajadores = db.relationship('Trabajador', backref='centro_consumo', lazy=True)
+    consumos = db.relationship('Consumo', backref='centro_consumo', lazy=True)
+    
+    def __repr__(self):
+        return f'<CentroConsumo {self.nombre}>'
+
+class Trabajador(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    codigo = db.Column(db.String(20), unique=True, nullable=False)
+    nombre = db.Column(db.String(100), nullable=False)
+    activo = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relación con centro de consumo
+    centro_consumo_id = db.Column(db.Integer, db.ForeignKey('centro_consumo.id'), nullable=False)
+    
+    # NUEVA RELACIÓN CON CONSUMOS
+    consumos = db.relationship('Consumo', backref='trabajador', lazy=True)
+    
+    def __repr__(self):
+        return f'<Trabajador {self.codigo} - {self.nombre}>'
+
 class Insumo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     
@@ -68,7 +98,7 @@ class Insumo(db.Model):
         """Calcula el valor total del stock actual"""
         return self.stock_actual * self.precio_unitario
     
-# NUEVA: Propiedad para alertas
+    # NUEVA: Propiedad para alertas
     @property
     def necesita_reposicion(self):
         """Verifica si el stock está por debajo del mínimo"""
@@ -81,7 +111,6 @@ class Insumo(db.Model):
             return (self.stock_actual / self.stock_minimo) * 100
         return 0
         
-
     def __repr__(self):
         return f'<Insumo {self.denominacion} - {self.tipo} ({self.modelo})>'
 
@@ -132,11 +161,14 @@ class Consumo(db.Model):
     # Relación con insumo
     insumo_id = db.Column(db.Integer, db.ForeignKey('insumo.id'), nullable=False)
     
+    # NUEVAS relaciones con centro de consumo y trabajador
+    centro_consumo_id = db.Column(db.Integer, db.ForeignKey('centro_consumo.id'), nullable=False)
+    trabajador_id = db.Column(db.Integer, db.ForeignKey('trabajador.id'), nullable=False)
+    
     # Datos del consumo
     cantidad_unidades = db.Column(db.Float, nullable=False)
     proyecto = db.Column(db.String(100))
     observaciones = db.Column(db.String(200))
-    responsable = db.Column(db.String(100), nullable=False)
     
     # Metadata
     fecha_consumo = db.Column(db.DateTime, default=datetime.utcnow)

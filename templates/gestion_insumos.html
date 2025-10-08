@@ -232,7 +232,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarCambios()">
+                <button type="button" class="btn btn-primary" onclick="guardarEdicionInsumo()">
                     💾 Guardar Cambios
                 </button>
             </div>
@@ -266,66 +266,79 @@ function calcularPrecioUnitario() {
 }
 
 // Editar insumo - llenar formulario
-function editarInsumo(insumoId) {
-    fetch(`/get_insumo/${insumoId}`)
-        .then(response => response.json())
-        .then(insumo => {
-            document.getElementById('editId').value = insumo.id;
+// En la función que abre el modal de edición
+
+// Agregá esta función para limpiar el modal cuando se cierra
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('modalEditarInsumo');
+    
+    if (modal) {
+        // Cuando el modal se oculta, limpiar el backdrop de Bootstrap
+        modal.addEventListener('hidden.bs.modal', function() {
+            // Remover el backdrop si existe
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                backdrop.remove();
+            });
             
-            const denominacionSelect = document.getElementById('editDenominacion');
-            const otraInput = document.getElementById('editOtraDenominacion');
-            if (['superassilex', 'super tack'].includes(insumo.denominacion)) {
-                denominacionSelect.value = insumo.denominacion;
-                otraInput.classList.add('d-none');
-            } else {
-                denominacionSelect.value = 'otro';
-                otraInput.classList.remove('d-none');
-                otraInput.value = insumo.denominacion;
+            // Remover la clase modal-open del body
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+        
+        // También forzar cierre si hay problemas
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
             }
+        });
+    }
+});
+
+// Y modificá la función editarInsumo para usar mejor Bootstrap
+function editarInsumo(insumoId) {
+    console.log('Editando insumo ID:', insumoId);
+    
+    const modalElement = document.getElementById('modalEditarInsumo');
+    if (!modalElement) {
+        alert('Error: No se encontró el formulario de edición');
+        return;
+    }
+    
+    // Cerrar modal existente si está abierto
+    const existingModal = bootstrap.Modal.getInstance(modalElement);
+    if (existingModal) {
+        existingModal.hide();
+    }
+    
+    fetch('/get_insumo/' + insumoId)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Datos recibidos:', data);
             
-            document.getElementById('editTipo').value = insumo.tipo;
-            document.getElementById('editModelo').value = insumo.modelo;
-            document.getElementById('editCantidadCaja').value = insumo.cantidad_por_caja;
-            document.getElementById('editPrecioCaja').value = insumo.precio_caja;
-            document.getElementById('editPrecioUnitario').value = insumo.precio_unitario;
-            document.getElementById('editCodigoBarras').value = insumo.codigo_barras || '';
-            document.getElementById('editStockMinimo').value = insumo.stock_minimo || '';
+            // Llenar los campos (usá tu código que ya funciona)
+            if (document.getElementById('editId')) document.getElementById('editId').value = data.id;
+            if (document.getElementById('editDenominacion')) document.getElementById('editDenominacion').value = data.denominacion || '';
+            if (document.getElementById('editTipo')) document.getElementById('editTipo').value = data.tipo || '';
+            if (document.getElementById('editModelo')) document.getElementById('editModelo').value = data.modelo || '';
+            if (document.getElementById('editCantidadCaja')) document.getElementById('editCantidadCaja').value = data.cantidad_por_caja || '';
+            if (document.getElementById('editPrecioCaja')) document.getElementById('editPrecioCaja').value = data.precio_caja || '';
+            if (document.getElementById('editPrecioUnitario')) document.getElementById('editPrecioUnitario').value = data.precio_unitario || '';
+            if (document.getElementById('editCodigoBarras')) document.getElementById('editCodigoBarras').value = data.codigo_barras || '';
+            if (document.getElementById('editStockMinimo')) document.getElementById('editStockMinimo').value = data.stock_minimo || '';
             
-            // Mostrar información de stock actual
-            const infoStock = document.getElementById('infoStockActual');
-            infoStock.innerHTML = `
-                <div class="row">
-                    <div class="col-4">
-                        <strong>Stock actual:</strong><br>
-                        <span class="badge ${insumo.stock_actual > 0 ? 'bg-success' : 'bg-danger'}">
-                            ${insumo.stock_actual} unidades
-                        </span>
-                    </div>
-                    <div class="col-4">
-                        <strong>En cajas:</strong><br>
-                        ${insumo.stock_en_cajas} caja(s)
-                    </div>
-                    <div class="col-4">
-                        <strong>Valor stock:</strong><br>
-                        $${insumo.valor_stock_actual.toFixed(2)}
-                    </div>
-                </div>
-                ${insumo.stock_minimo > 0 ? `
-                <div class="row mt-2">
-                    <div class="col-12">
-                        <strong>Estado de alerta:</strong>
-                        ${insumo.necesita_reposicion ? 
-                            '<span class="badge bg-danger ms-2">🔴 STOCK BAJO</span>' : 
-                            '<span class="badge bg-success ms-2">✅ STOCK OK (' + insumo.porcentaje_stock.toFixed(1) + '%)</span>'
-                        }
-                    </div>
-                </div>
-                ` : ''}
-            `;
+            // Crear nueva instancia del modal y mostrarlo
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error al cargar los datos del insumo');
+            alert('Error al cargar los datos: ' + error.message);
         });
 }
 
@@ -356,6 +369,51 @@ function eliminarInsumo(insumoId) {
             alert('Error al eliminar el insumo');
         });
     }
+}
+
+function guardarEdicionInsumo() {
+    console.log('🔄 Guardando edición del insumo...');
+    
+    const denominacion = document.getElementById('editDenominacion').value;
+    if (!denominacion || denominacion.trim() === '') {
+        alert('❌ La denominación es obligatoria');
+        document.getElementById('editDenominacion').focus();
+        return false;
+    }
+    
+    // Validar otros campos importantes
+    const cantidadCaja = document.getElementById('editCantidadCaja').value;
+    const precioCaja = document.getElementById('editPrecioCaja').value;
+    const precioUnitario = document.getElementById('editPrecioUnitario').value;
+    
+    if (!cantidadCaja || cantidadCaja <= 0) {
+        alert('❌ La cantidad por caja debe ser mayor a 0');
+        document.getElementById('editCantidadCaja').focus();
+        return false;
+    }
+    
+    if (!precioCaja || precioCaja < 0) {
+        alert('❌ El precio por caja no puede ser negativo');
+        document.getElementById('editPrecioCaja').focus();
+        return false;
+    }
+    
+    if (!precioUnitario || precioUnitario < 0) {
+        alert('❌ El precio unitario no puede ser negativo');
+        document.getElementById('editPrecioUnitario').focus();
+        return false;
+    }
+    
+    // Mostrar loading
+    const btnGuardar = document.querySelector('#modalEditarInsumo .btn-primary');
+    const originalText = btnGuardar.innerHTML;
+    btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
+    btnGuardar.disabled = true;
+    
+    // Enviar el formulario
+    document.getElementById('formEditarInsumo').submit();
+    
+    return true;
 }
 
 // Búsqueda y filtrado en tiempo real
